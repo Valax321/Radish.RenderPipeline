@@ -86,7 +86,7 @@ Shader "Hidden/Radish/FXAA"
             #define FXAA_SUBPIX 1.0
             #endif
             
-            #include "Assets/Game/Shaders/PostProcessing/FXAA.hlsl"
+            #include "Packages/com.radish.render-pipeline/Shaders/FXAA.hlsl"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
 
             #pragma vertex FXAA_Vert

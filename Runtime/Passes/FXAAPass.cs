@@ -15,6 +15,7 @@ namespace Radish.Rendering.Passes
     
     [Serializable]
     [SupportedOnRenderPipeline(typeof(RadishRenderPipelineAsset))]
+    [UnityEngine.Categorization.CategoryInfo(Name = "Radish FXAA Pass Resources")]
     internal class FXAAResources : IRenderPipelineResources
     {
         public int version => 0;

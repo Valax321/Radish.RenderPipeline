@@ -16,7 +16,8 @@ namespace Radish.Rendering.Passes
     
     [Serializable]
     [SupportedOnRenderPipeline(typeof(RadishRenderPipelineAsset))]
-    public class TonemapResources : IRenderPipelineResources
+    [UnityEngine.Categorization.CategoryInfo(Name = "Radish Tonemapping Pass Resources")]
+    internal sealed class TonemapResources : IRenderPipelineResources
     {
         public int version => 0;
 
@@ -32,8 +33,9 @@ namespace Radish.Rendering.Passes
     {
         public enum TonemapType
         {
+            None = -1,
             Neutral = 0,
-            ACES = 1
+            ACES = 1,
         }
 
         private static Material s_Material;
@@ -70,7 +72,8 @@ namespace Radish.Rendering.Passes
 
         protected override bool ShouldCullPass(in RenderPassContext passContext, in CameraContext cameraContext)
         {
-            return !cameraContext.VolumeStack.GetComponent<TonemapperComponent>().active;
+            var c = cameraContext.VolumeStack.GetComponent<TonemapperComponent>();
+            return !c.active || c.type.value == TonemapType.None;
         }
     }
 }

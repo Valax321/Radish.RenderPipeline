@@ -31,6 +31,23 @@ namespace Radish.Rendering
         
         protected const int LinearToSRGBPassIndex = 0;
         protected const int SRGBToLinearPassIndex = 1;
+
+        private static Material s_BlitMaterial;
+        private static readonly int s_MainTexProp = Shader.PropertyToID("_MainTex");
+
+        protected static Material blitMaterial
+        {
+            get
+            {
+                if (!s_BlitMaterial)
+                {
+                    var settings = GraphicsSettings.GetRenderPipelineSettings<RadishBuiltinResources>();
+                    InitMaterial(ref s_BlitMaterial, settings.blitShader);
+                }
+
+                return s_BlitMaterial;
+            }
+        }
         
         public RenderPass(string name)
         {
@@ -52,7 +69,7 @@ namespace Radish.Rendering
             {
                 //TODO: Register color/depth use if requested
                 
-                SetupPass(passData, context, cameraContext, ref builder);
+                SetupPass(passData, in context, in cameraContext, ref builder);
             }
             finally
             {
@@ -87,6 +104,14 @@ namespace Radish.Rendering
             sceneColorDesc.name = $"{name} Temp Texture";
             sceneColorDesc.msaaSamples = MSAASamples.None;
             return builder.CreateTransientTexture(in sceneColorDesc);
+        }
+
+        protected static void BlitProcedural(CommandBuffer cmd, RTHandle source, Material material, int pass)
+        {
+            var propBlock = MaterialPropertyBlockPool.Get();
+            propBlock.SetTexture(s_MainTexProp, source);
+            cmd.DrawProcedural(Matrix4x4.identity, material, pass, MeshTopology.Triangles, 3, 1, propBlock);
+            MaterialPropertyBlockPool.Release(propBlock);
         }
     }
 }

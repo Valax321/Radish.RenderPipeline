@@ -1,4 +1,5 @@
 using System;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace Radish.Rendering
@@ -13,6 +14,11 @@ namespace Radish.Rendering
             this.name = name;
             id = Shader.PropertyToID(this.name);
         }
+
+        [PublicAPI]
+        public static readonly ResourceIdentifier nullIdentifier = new(string.Empty);
+
+        public bool IsValid() => id != nullIdentifier.id;
 
         public bool Equals(ResourceIdentifier other)
         {

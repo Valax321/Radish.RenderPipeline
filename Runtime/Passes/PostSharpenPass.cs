@@ -15,6 +15,7 @@ namespace Radish.Rendering.Passes
 
     [Serializable]
     [SupportedOnRenderPipeline(typeof(RadishRenderPipelineAsset))]
+    [UnityEngine.Categorization.CategoryInfo(Name = "Radish Sharpen Pass Resources")]
     internal sealed class PostSharpenPassResources : IRenderPipelineResources
     {
         public int version => 0;

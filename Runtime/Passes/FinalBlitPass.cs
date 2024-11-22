@@ -1,4 +1,5 @@
 using JetBrains.Annotations;
+using UnityEngine;
 using UnityEngine.Rendering.RenderGraphModule;
 
 namespace Radish.Rendering.Passes
@@ -7,11 +8,14 @@ namespace Radish.Rendering.Passes
     {
         public TextureHandle Dest;
         public TextureHandle Src;
+        public Rect Viewport;
     }
     
     [PublicAPI]
     public sealed class FinalBlitPass : RenderPass<FinalBlitPassData>
     {
+        private static readonly int BlitParamsProp = Shader.PropertyToID("_BlitParams");
+        private static readonly int MainTexProp = Shader.PropertyToID("_MainTex");
         private ResourceIdentifier m_Source;
         private ResourceIdentifier m_Destination;
         
@@ -29,10 +33,13 @@ namespace Radish.Rendering.Passes
 
             data.Dest = backbuffer.RegisterUse(builder.WriteTexture(backbuffer.value));
             data.Src = src.RegisterUse(builder.ReadTexture(src.value));
+            data.Viewport = cameraContext.Camera.pixelRect;
             
             builder.SetRenderFunc<FinalBlitPassData>(static (data, ctx) =>
             {
-                ctx.cmd.Blit(data.Src, data.Dest);
+                ctx.cmd.SetRenderTarget(data.Dest);
+                ctx.cmd.SetViewport(data.Viewport);
+                BlitProcedural(ctx.cmd, data.Src, blitMaterial, 0);
             });
         }
     }

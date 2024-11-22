@@ -14,12 +14,13 @@ namespace Radish.Rendering.Passes
 
     [Serializable]
     [SupportedOnRenderPipeline(typeof(RadishRenderPipelineAsset))]
+    [UnityEngine.Categorization.CategoryInfo(Name = "Radish Upscale Pass Resources")]
     internal sealed class CameraTargetBlitResources : IRenderPipelineResources
     {
         public int version => 0;
         public bool isAvailableInPlayerBuild => true;
 
-        [ResourcePath("Hidden/PostProcessing/FinalBlit", SearchType.ShaderName)]
+        [ResourcePath("Hidden/Radish/UpscaleBlit", SearchType.ShaderName)]
         [SerializeField] private Shader m_BlitShader;
 
         public Shader BlitShader => m_BlitShader;

@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Radish.Rendering
 {
     [PublicAPI]
-    public abstract class Renderer : ScriptableObject
+    public abstract class RadishRenderer : ScriptableObject
     {
         private readonly List<RenderPassBase> m_Passes = new();
         private bool m_Initialized;
@@ -38,7 +38,7 @@ namespace Radish.Rendering
             }
         }
 
-        public void Cleanup()
+        public void Invalidate()
         {
             m_Passes.Clear();
             m_Initialized = false;

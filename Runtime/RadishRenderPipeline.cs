@@ -1,13 +1,17 @@
 using System;
+using Radish.Logging;
 using Radish.Rendering.Settings;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
+using ILogger = Radish.Logging.ILogger;
 
 namespace Radish.Rendering
 {
     public abstract class RadishRenderPipeline : RenderPipeline
     {
+        private static readonly ILogger s_Logger = LogManager.GetLoggerForType(typeof(RadishRenderPipeline));
+        
         public RadishRenderPipelineAsset asset { get; }
         public RenderGraph graph { get; private set; }
         public RenderPassManager renderPassManager { get; private set; }
@@ -15,20 +19,50 @@ namespace Radish.Rendering
         public RadishRenderPipeline(RadishRenderPipelineAsset asset)
         {
             this.asset = asset;
+            
+#if false
+            var t = EditorGraphicsSettings.GetRenderPipelineGlobalSettingsAsset(GetType());
+            if (!t)
+            {
+                var settingsAttr = GetType().GetCustomAttribute<PipelineSettingsAttribute>();
+                if (settingsAttr == null)
+                {
+                    throw new MissingAttributeException(typeof(PipelineSettingsAttribute));
+                }
+
+                if (settingsAttr.type?.IsSubclassOf(typeof(RenderPipelineGlobalSettings)) ?? false)
+                {
+                    throw new InvalidCastException(
+                        $"{nameof(PipelineSettingsAttribute)} did not provide a valid {nameof(RenderPipelineGlobalSettings)} type");
+                }
+                
+                var settings = (RenderPipelineGlobalSettings)ScriptableObject.CreateInstance(settingsAttr.type);
+                Debug.Assert(settings, "ScriptableObject.CreateInstance returned null?");
+                
+                AssetDatabase.CreateAsset(settings,
+                    $"Assets/{GetType().Name}_Settings.asset");
+                
+                EditorGraphicsSettings.SetRenderPipelineGlobalSettingsAsset(GetType(), settings);
+                s_Logger.Info(asset, "Set global settings for render pipeline");
+            }
+#endif
 
             GraphicsSettings.lightsUseLinearIntensity = asset.lightsUseLinearIntensity;
             GraphicsSettings.lightsUseColorTemperature = asset.lightsUseColorTemperature;
 
             var volumeProfileSettings = GraphicsSettings.GetRenderPipelineSettings<RadishDefaultVolumeSettings>();
-            VolumeManager.instance.Initialize(volumeProfileSettings.volumeProfile, asset.defaultVolumeProfile);
+            if (volumeProfileSettings != null)
+            {
+                VolumeManager.instance.Initialize(volumeProfileSettings.volumeProfile, asset.defaultVolumeProfile);
+            }
         }
 
         protected override void Dispose(bool disposing)
         {
+            base.Dispose(disposing);
+            
             CleanupRenderGraph();
             VolumeManager.instance.Deinitialize();
-            
-            base.Dispose(disposing);
         }
 
         protected override void Render(ScriptableRenderContext context, Camera[] cameras)
@@ -114,14 +148,14 @@ namespace Radish.Rendering
 
         private void InitializeRenderGraph()
         {
-            graph ??= new RenderGraph(GetType().Name);
+            graph ??= new RenderGraph(asset.name);
             renderPassManager ??= new RenderPassManager(this);
             asset.renderer?.Initialize(this);
         }
 
         private void CleanupRenderGraph()
         {
-            asset.renderer?.Cleanup();
+            asset.renderer?.Invalidate();
             renderPassManager = null;
             
             if (graph is not null)
