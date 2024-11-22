@@ -1,0 +1,22 @@
+{
+    "name": "Radish.Rendering.Editor",
+    "rootNamespace": "Radish.Rendering",
+    "references": [
+        "GUID:8bdea64740185594d97902a78bd70061",
+        "GUID:6603ed48f3353b541a1b325b7ef493ec",
+        "GUID:df380645f10b7bc4b97d4f5eb6303d95",
+        "GUID:3eae0364be2026648bf74846acb8a731",
+        "GUID:53cd1d743dc80460f962abe93c1bd8a2"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
