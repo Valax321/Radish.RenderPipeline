@@ -9,6 +9,7 @@ namespace Radish.Rendering
     {
         private readonly List<RenderPassBase> m_Passes = new();
         private bool m_Initialized;
+        private RenderPassManager m_RenderPassManager;
         
         protected abstract void SetupFrameResources(RadishRenderPipeline pipeline);
         protected abstract void SetupFramePasses(RadishRenderPipeline pipeline);
@@ -18,6 +19,7 @@ namespace Radish.Rendering
         {
             if (!m_Initialized)
             {
+                m_RenderPassManager = pipeline.renderPassManager;
                 SetupFrameResources(pipeline);
                 SetupFramePasses(pipeline);
                 OnInitialized(pipeline);
@@ -40,6 +42,8 @@ namespace Radish.Rendering
 
         public void Invalidate()
         {
+            m_RenderPassManager.InvalidateInitializers();
+            m_RenderPassManager = null;
             m_Passes.Clear();
             m_Initialized = false;
         }

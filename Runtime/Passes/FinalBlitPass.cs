@@ -28,10 +28,10 @@ namespace Radish.Rendering.Passes
         protected override void SetupPass(FinalBlitPassData data, in RenderPassContext passContext, in CameraContext cameraContext,
             ref RenderGraphBuilder builder)
         {
-            var backbuffer = passContext.passManager.Get<TextureHandle>(m_Destination);
+            var dest = passContext.passManager.Get<TextureHandle>(m_Destination);
             var src = passContext.passManager.Get<TextureHandle>(m_Source);
 
-            data.Dest = backbuffer.RegisterUse(builder.WriteTexture(backbuffer.value));
+            data.Dest = dest.RegisterUse(builder.WriteTexture(dest.value));
             data.Src = src.RegisterUse(builder.ReadTexture(src.value));
             data.Viewport = cameraContext.Camera.pixelRect;
             

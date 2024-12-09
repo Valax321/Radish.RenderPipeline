@@ -7,8 +7,8 @@ namespace Radish.Rendering.Passes
 {
     public sealed class UpscaleCopyPassData
     {
-        public TextureHandle SceneColor;
-        public TextureHandle CameraTarget;
+        public TextureHandle Source;
+        public TextureHandle Destination;
         public ResolutionScaleMethod Method;
     }
 
@@ -45,29 +45,22 @@ namespace Radish.Rendering.Passes
             ref RenderGraphBuilder builder)
         {
             var resources = GraphicsSettings.GetRenderPipelineSettings<CameraTargetBlitResources>();
-            var sceneColor = passContext.passManager.Get<TextureHandle>(m_Source);
-            var cameraTarget = passContext.passManager.Get<TextureHandle>(m_Destination);
+            var src = passContext.passManager.Get<TextureHandle>(m_Source);
+            var dest = passContext.passManager.Get<TextureHandle>(m_Destination);
             
             InitMaterial(ref s_BlitMaterial, resources.BlitShader);
             
-            data.SceneColor = sceneColor.RegisterUse(builder.ReadTexture(sceneColor.value));
-            data.CameraTarget = cameraTarget.RegisterUse(builder.WriteTexture(cameraTarget.value));
+            data.Source = src.RegisterUse(builder.ReadTexture(src.value));
+            data.Destination = dest.RegisterUse(builder.WriteTexture(dest.value));
             
             builder.AllowPassCulling(false);
 
-            if (ScalableBufferManager.widthScaleFactor >= 1 || !cameraContext.Camera.allowDynamicResolution)
-            {
-                data.Method = ResolutionScaleMethod.Nearest;
-            }
-            else
-            {
-                var settings = cameraContext.VolumeStack.GetComponent<UpscaleComponent>();
-                data.Method = settings.upscaleMethod.value;
-            }
+            var settings = cameraContext.VolumeStack.GetComponent<UpscaleComponent>();
+            data.Method = settings.upscaleMethod.value;
             
             builder.SetRenderFunc<UpscaleCopyPassData>(static (data, context) =>
             {
-                context.cmd.Blit(data.SceneColor, data.CameraTarget, s_BlitMaterial, (int)data.Method);
+                context.cmd.Blit(data.Source, data.Destination, s_BlitMaterial, (int)data.Method);
             });
         }
     }

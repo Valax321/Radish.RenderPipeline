@@ -102,7 +102,6 @@ namespace Radish.Rendering
         {
             var sceneColorDesc = passContext.graph.GetTextureDesc(tex);
             sceneColorDesc.name = $"{name} Temp Texture";
-            sceneColorDesc.msaaSamples = MSAASamples.None;
             return builder.CreateTransientTexture(in sceneColorDesc);
         }
 

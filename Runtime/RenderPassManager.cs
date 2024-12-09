@@ -96,5 +96,10 @@ namespace Radish.Rendering
             m_FrameData[id.id] = data;
             return data;
         }
+
+        public void InvalidateInitializers()
+        {
+            m_DataInitializers.Clear();
+        }
     }
 }

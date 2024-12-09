@@ -80,7 +80,7 @@ namespace Radish.Rendering
             }
             catch (Exception ex)
             {
-                Debug.LogException(ex, asset);
+                s_Logger.Exception(asset, ex);
                 // If we get here the render graph is likely borked,
                 // so we clean it up and try again fresh.
                 CleanupRenderGraph();
@@ -137,7 +137,7 @@ namespace Radish.Rendering
         {
             if (!asset.renderer)
             {
-                Debug.LogError("No renderer assigned", asset);
+                s_Logger.Error(asset, "No renderer assigned");
                 return;
             }
             

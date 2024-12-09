@@ -4,7 +4,9 @@ using UnityEngine;
 
 namespace Radish.Rendering
 {
-    public readonly struct ResourceIdentifier : IEquatable<ResourceIdentifier>
+    public readonly struct ResourceIdentifier : 
+        IEquatable<ResourceIdentifier>, 
+        IComparable<ResourceIdentifier>
     {
         public string name { get; }
         public int id { get; }
@@ -38,6 +40,11 @@ namespace Radish.Rendering
         public override string ToString()
         {
             return name;
+        }
+
+        public int CompareTo(ResourceIdentifier other)
+        {
+            return id.CompareTo(other.id);
         }
     }
 }
