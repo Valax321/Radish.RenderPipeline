@@ -42,7 +42,7 @@ namespace Radish.Rendering
 
         public void Invalidate()
         {
-            m_RenderPassManager.InvalidateInitializers();
+            m_RenderPassManager?.InvalidateInitializers();
             m_RenderPassManager = null;
             m_Passes.Clear();
             m_Initialized = false;

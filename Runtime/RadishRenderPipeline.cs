@@ -62,7 +62,7 @@ namespace Radish.Rendering
             base.Dispose(disposing);
             
             CleanupRenderGraph();
-            VolumeManager.instance.Deinitialize();
+            VolumeManager.instance?.Deinitialize();
         }
 
         protected override void Render(ScriptableRenderContext context, Camera[] cameras)
