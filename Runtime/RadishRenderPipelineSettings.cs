@@ -8,21 +8,22 @@ using UnityEngine.Rendering;
 namespace Radish.Rendering
 {
     [SupportedOnRenderPipeline(typeof(RadishRenderPipelineAsset))]
-    public abstract class RadishRenderPipelineSettings<TPipeline> 
-        : RenderPipelineGlobalSettings<RadishRenderPipelineSettings<TPipeline>, TPipeline>
+    public abstract class RadishRenderPipelineSettings<TSelf, TPipeline> 
+        : RenderPipelineGlobalSettings<TSelf, TPipeline>
+        where TSelf : RenderPipelineGlobalSettings<TSelf, TPipeline>
         where TPipeline : RenderPipeline
     {
         [SerializeField] private RenderPipelineGraphicsSettingsContainer m_Settings = new();
         protected override List<IRenderPipelineGraphicsSettings> settingsList => m_Settings.settingsList;
 
 #if UNITY_EDITOR
-        private static string GetDefaultPath() => $"Assets/Settings/{typeof(TPipeline).Name}GlobalSettings.asset";
+        protected static string GetDefaultPath() => $"Assets/Settings/{typeof(TPipeline).Name}GlobalSettings.asset";
         
-        public static RadishRenderPipelineSettings<TPipeline> Ensure(bool canCreateNewAsset = true)
+        public static TSelf Ensure(bool canCreateNewAsset = true)
         {
-            var currentInstance = GraphicsSettings.GetSettingsForRenderPipeline<TPipeline>() as RadishRenderPipelineSettings<TPipeline>;
+            var currentInstance = GraphicsSettings.GetSettingsForRenderPipeline<TPipeline>() as TSelf;
             
-            if (RenderPipelineGlobalSettingsUtils.TryEnsure<RadishRenderPipelineSettings<TPipeline>, TPipeline>(ref currentInstance, GetDefaultPath(),
+            if (RenderPipelineGlobalSettingsUtils.TryEnsure<TSelf, TPipeline>(ref currentInstance, GetDefaultPath(),
                     canCreateNewAsset))
             {
                 if (currentInstance)
