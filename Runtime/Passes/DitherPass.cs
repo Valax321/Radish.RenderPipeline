@@ -38,6 +38,8 @@ namespace Radish.Rendering.Passes
     [PublicAPI]
     public sealed class DitherPass : RenderPass<DitherPassData>
     {
+        public bool SkipForSceneView { get; set; } = true;
+        
         private ResourceIdentifier m_ColorTexture;
 
         private static Material s_DitherMaterial;
@@ -82,6 +84,9 @@ namespace Radish.Rendering.Passes
 
         protected override bool ShouldCullPass(in RenderPassContext passContext, in CameraContext cameraContext)
         {
+            if (SkipForSceneView && cameraContext.Camera.cameraType is CameraType.SceneView or CameraType.Preview)
+                return true;
+            
             var resources = GraphicsSettings.GetRenderPipelineSettings<DitherPassResources>();
             var settings = cameraContext.VolumeStack.GetComponent<DitherComponent>();
 
