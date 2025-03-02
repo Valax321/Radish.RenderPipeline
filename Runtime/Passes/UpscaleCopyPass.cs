@@ -60,7 +60,8 @@ namespace Radish.Rendering.Passes
             
             builder.SetRenderFunc<UpscaleCopyPassData>(static (data, context) =>
             {
-                context.cmd.Blit(data.Source, data.Destination, s_BlitMaterial, (int)data.Method);
+                context.cmd.SetRenderTarget(data.Destination);
+                BlitProcedural(context.cmd, data.Source, s_BlitMaterial, (int)data.Method);
             });
         }
     }

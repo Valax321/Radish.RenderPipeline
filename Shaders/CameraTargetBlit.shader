@@ -12,43 +12,37 @@ Shader "Hidden/Radish/CameraTargetBlit"
 
         Pass
         {
+            Name "Standard Blit"
             HLSLPROGRAM
 
-            #include "Packages/com.radish.render-pipeline/ShaderLibrary/Common.hlsl"
+            #include "Packages/com.radish.render-pipeline/ShaderLibrary/BlitPass.hlsl"
 
-            #pragma vertex BlitVertex
+            #pragma vertex BlitPassVertex
             #pragma fragment BlitFragment
             #pragma target 5.0
-
-            RADISH_DECLARE_TEX2D_NOSAMPLER(_MainTex);
             
-            struct Varyings
+            float4 BlitFragment(BlitPassVaryings IN) : SV_TARGET
             {
-                float4 positionCS : SV_POSITION;
-                float2 texcoord : TEXCOORD0;
-            };
-
-            Varyings BlitVertex(uint vertexID : SV_VertexID)
-            {
-                Varyings OUT;
-
-                OUT.positionCS = float4(
-		            vertexID <= 1 ? -1.0 : 3.0,
-		            vertexID == 1 ? 3.0 : -1.0,
-		            0.0, 1.0
-	            );
-
-                OUT.positionCS.y *= _ProjectionParams.x;
-
-                OUT.texcoord = float2(
-		            vertexID <= 1 ? 0.0 : 2.0,
-		            vertexID == 1 ? 2.0 : 0.0
-	            );
-
-                return OUT;
+                return SAMPLE_TEXTURE2D_LOD(_MainTex, sampler_PointClamp, IN.texcoord, 0);
             }
 
-            float4 BlitFragment(Varyings IN) : SV_TARGET
+            ENDHLSL
+        }
+
+        Pass
+        {
+            Name "AlphaBlend Blit"
+            Blend SrcAlpha OneMinusSrcAlpha
+            
+            HLSLPROGRAM
+
+            #include "Packages/com.radish.render-pipeline/ShaderLibrary/BlitPass.hlsl"
+
+            #pragma vertex BlitPassVertex
+            #pragma fragment BlitFragment
+            #pragma target 5.0
+            
+            float4 BlitFragment(BlitPassVaryings IN) : SV_TARGET
             {
                 return SAMPLE_TEXTURE2D_LOD(_MainTex, sampler_PointClamp, IN.texcoord, 0);
             }

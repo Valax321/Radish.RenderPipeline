@@ -13,6 +13,7 @@ namespace Radish.Rendering
         public string name { get; }
         
         private ProfilingSampler m_Sampler;
+        public ProfilingSampler ProfilingSampler => m_Sampler;
         
         private static Material s_ColorSpaceConvertShader;
         protected static Material colorSpaceConvertMaterial
@@ -105,12 +106,18 @@ namespace Radish.Rendering
             return builder.CreateTransientTexture(in sceneColorDesc);
         }
 
+        private static ProfilingSampler s_BlitProceduralSampler;
+
         protected static void BlitProcedural(CommandBuffer cmd, RTHandle source, Material material, int pass)
         {
-            var propBlock = MaterialPropertyBlockPool.Get();
-            propBlock.SetTexture(s_MainTexProp, source);
-            cmd.DrawProcedural(Matrix4x4.identity, material, pass, MeshTopology.Triangles, 3, 1, propBlock);
-            MaterialPropertyBlockPool.Release(propBlock);
+            s_BlitProceduralSampler ??= new ProfilingSampler("RenderPass.BlitProcedural");
+            using (new ProfilingScope(cmd, s_BlitProceduralSampler))
+            {
+                var propBlock = MaterialPropertyBlockPool.Get();
+                propBlock.SetTexture(s_MainTexProp, source);
+                cmd.DrawProcedural(Matrix4x4.identity, material, pass, MeshTopology.Triangles, 3, 1, propBlock);
+                MaterialPropertyBlockPool.Release(propBlock);
+            }
         }
     }
 }

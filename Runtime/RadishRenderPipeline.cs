@@ -89,10 +89,16 @@ namespace Radish.Rendering
 
         private void RenderCamera(Camera camera, ScriptableRenderContext context)
         {
-            BeginCameraRendering(context, camera);
+            // Do this before BeginCameraRendering so that callbacks can get access to volume data
+            // if they need it
             GetCameraVolumeManagerData(camera, out var mask, out var t);
-            
             VolumeManager.instance.Update(t, mask);
+            
+            BeginCameraRendering(context, camera);
+            
+            if (camera.cameraType == CameraType.SceneView)
+                ScriptableRenderContext.EmitWorldGeometryForSceneView(camera);
+            ScriptableRenderContext.EmitGeometryForCamera(camera);
             
             if (!camera.TryGetCullingParameters(out var cameraCullingParams))
                 return;
@@ -122,6 +128,9 @@ namespace Radish.Rendering
             context.ExecuteCommandBuffer(buffer);
             CommandBufferPool.Release(buffer);
             context.Submit();
+            
+            if (context.HasInvokeOnRenderObjectCallbacks())
+                context.InvokeOnRenderObjectCallback();
             
             EndCameraRendering(context, camera);
         }

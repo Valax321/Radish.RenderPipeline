@@ -65,8 +65,11 @@ namespace Radish.Rendering.Passes
             
             builder.SetRenderFunc<TonemapperPassData>(static (data, ctx) =>
             {
-                ctx.cmd.Blit(data.SceneColor, data.TempColor, data.TonemapperMaterial, (int)data.Type);
-                ctx.cmd.Blit(data.TempColor, data.SceneColor);
+                ctx.cmd.SetRenderTarget(data.TempColor);
+                BlitProcedural(ctx.cmd, data.SceneColor, data.TonemapperMaterial, (int)data.Type);
+                
+                ctx.cmd.SetRenderTarget(data.SceneColor);
+                BlitProcedural(ctx.cmd, data.TempColor, blitMaterial, 0);
             });
         }
 

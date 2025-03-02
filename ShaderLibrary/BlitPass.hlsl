@@ -15,12 +15,22 @@ struct BlitPassVaryings
     float2 texcoord : TEXCOORD0;
 };
 
-BlitPassVaryings BlitPassVertex(in BlitPassAttributes IN)
+BlitPassVaryings BlitPassVertex(uint vertexID : SV_VertexID)
 {
     BlitPassVaryings OUT;
 
-    OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-    OUT.texcoord = IN.texcoord;
+    OUT.positionCS = float4(
+        vertexID <= 1 ? -1.0 : 3.0,
+        vertexID == 1 ? 3.0 : -1.0,
+        0.0, 1.0
+    );
+
+    OUT.positionCS.y *= _ProjectionParams.x;
+
+    OUT.texcoord = float2(
+        vertexID <= 1 ? 0.0 : 2.0,
+        vertexID == 1 ? 2.0 : 0.0
+    );
 
     return OUT;
 }
