@@ -11,11 +11,11 @@ namespace Radish.Rendering
         private bool m_Initialized;
         private RenderPassManager m_RenderPassManager;
         
-        protected abstract void SetupFrameResources(RadishRenderPipeline pipeline);
-        protected abstract void SetupFramePasses(RadishRenderPipeline pipeline);
-        protected virtual void OnInitialized(RadishRenderPipeline pipeline) { }
+        protected abstract void SetupFrameResources(IRenderPassManagerProvider pipeline);
+        protected abstract void SetupFramePasses(IRenderPassManagerProvider pipeline);
+        protected virtual void OnInitialized(IRenderPassManagerProvider pipeline) { }
         
-        public void Initialize(RadishRenderPipeline pipeline)
+        public void Initialize(IRenderPassManagerProvider pipeline)
         {
             if (!m_Initialized)
             {
@@ -32,7 +32,7 @@ namespace Radish.Rendering
             m_Passes.Add(pass);
         }
 
-        public virtual void RecordCameraPasses(RadishRenderPipeline pipeline, in CameraContext cameraContext)
+        public virtual void RecordCameraPasses(IRenderPassManagerProvider pipeline, in CameraContext cameraContext)
         {
             foreach (var pass in m_Passes)
             {

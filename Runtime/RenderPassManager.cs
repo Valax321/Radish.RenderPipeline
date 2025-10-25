@@ -13,7 +13,7 @@ namespace Radish.Rendering
             public ResourceIdentifier id { get; internal set; }
             public Camera camera { get; internal set; }
             public RenderPassManager passManager => pipeline.renderPassManager;
-            public RadishRenderPipeline pipeline { get; internal set; }
+            public IRenderPassManagerProvider pipeline { get; internal set; }
             public RenderGraph graph => pipeline.graph;
         }
 
@@ -36,7 +36,7 @@ namespace Radish.Rendering
             }
         }
         
-        public RadishRenderPipeline pipeline { get; }
+        public IRenderPassManagerProvider pipeline { get; }
 
         private readonly Dictionary<int, object> m_FrameData = new();
 
@@ -44,7 +44,7 @@ namespace Radish.Rendering
 
         private Camera m_ActiveCamera;
         
-        public RenderPassManager(RadishRenderPipeline pipeline)
+        public RenderPassManager(IRenderPassManagerProvider pipeline)
         {
             this.pipeline = pipeline;
         }

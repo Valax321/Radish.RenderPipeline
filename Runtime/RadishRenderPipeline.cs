@@ -8,44 +8,18 @@ using ILogger = Radish.Logging.ILogger;
 
 namespace Radish.Rendering
 {
-    public abstract class RadishRenderPipeline : RenderPipeline
+    public abstract class RadishRenderPipeline : RenderPipeline, IRenderPassManagerProvider
     {
         private static readonly ILogger s_Logger = LogManager.GetLoggerForType(typeof(RadishRenderPipeline));
         
         public RadishRenderPipelineAsset asset { get; }
         public RenderGraph graph { get; private set; }
         public RenderPassManager renderPassManager { get; private set; }
+        public RenderPipeline pipeline => this;
         
         public RadishRenderPipeline(RadishRenderPipelineAsset asset)
         {
             this.asset = asset;
-            
-#if false
-            var t = EditorGraphicsSettings.GetRenderPipelineGlobalSettingsAsset(GetType());
-            if (!t)
-            {
-                var settingsAttr = GetType().GetCustomAttribute<PipelineSettingsAttribute>();
-                if (settingsAttr == null)
-                {
-                    throw new MissingAttributeException(typeof(PipelineSettingsAttribute));
-                }
-
-                if (settingsAttr.type?.IsSubclassOf(typeof(RenderPipelineGlobalSettings)) ?? false)
-                {
-                    throw new InvalidCastException(
-                        $"{nameof(PipelineSettingsAttribute)} did not provide a valid {nameof(RenderPipelineGlobalSettings)} type");
-                }
-                
-                var settings = (RenderPipelineGlobalSettings)ScriptableObject.CreateInstance(settingsAttr.type);
-                Debug.Assert(settings, "ScriptableObject.CreateInstance returned null?");
-                
-                AssetDatabase.CreateAsset(settings,
-                    $"Assets/{GetType().Name}_Settings.asset");
-                
-                EditorGraphicsSettings.SetRenderPipelineGlobalSettingsAsset(GetType(), settings);
-                s_Logger.Info(asset, "Set global settings for render pipeline");
-            }
-#endif
 
             GraphicsSettings.lightsUseLinearIntensity = asset.lightsUseLinearIntensity;
             GraphicsSettings.lightsUseColorTemperature = asset.lightsUseColorTemperature;

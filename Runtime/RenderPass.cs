@@ -55,7 +55,7 @@ namespace Radish.Rendering
             this.name = name;
         }
 
-        public override void AddToGraph(RadishRenderPipeline pipeline, in CameraContext cameraContext)
+        public override void AddToGraph(IRenderPassManagerProvider pipeline, in CameraContext cameraContext)
         {
             m_Sampler ??= new ProfilingSampler(name);
             var context = new RenderPassContext(pipeline);
